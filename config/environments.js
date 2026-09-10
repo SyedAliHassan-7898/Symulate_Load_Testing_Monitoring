@@ -24,8 +24,8 @@ export const PORTALS = {
 
 export const CREDENTIALS = {
   superAdmin: {
-    email: __ENV.SUPER_ADMIN_EMAIL || 'superadmin@yopmail.com',
-    password: __ENV.SUPER_ADMIN_PASSWORD || 'Test@123'
+    email: __ENV.SUPER_ADMIN_EMAIL || SUPER_ADMIN_EMAIL,
+    password: __ENV.SUPER_ADMIN_PASSWORD || SUPER_ADMIN_PASSWORD
   }
 };
 
@@ -75,8 +75,8 @@ export const CLIENT_ADMIN_DEFAULT_PASSWORD = __ENV.CLIENT_ADMIN_DEFAULT_PASSWORD
 // Add more entries here when scaling to load tests (7-8 candidates).
 export const HARDCODED_CANDIDATES = [
   {
-    email: __ENV.CANDIDATE_EMAIL || 'scriptcan13@yopmail.com',
-    password: __ENV.CANDIDATE_PASSWORD || 'Test@123',
+    email: __ENV.CANDIDATE_EMAIL || CANDIDATE_EMAIL,
+    password: __ENV.CANDIDATE_PASSWORD || CANDIDATE_PASSWORD,
     candidateId: HARDCODED_ASSESSMENT_CANDIDATE_ID,
     projectId: HARDCODED_ASSESSMENT_PROJECT_ID,
     bookingId: HARDCODED_ASSESSMENT_BOOKING_ID,
