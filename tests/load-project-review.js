@@ -24,7 +24,7 @@ export const options = {
       ? {
           project_review_load: {
             executor: 'ramping-vus',
-            startVUs: 0,
+            startVUs: 100,
             stages: [
               { duration: LOAD_RAMP_UP, target: LOAD_VUS },
               { duration: LOAD_DURATION, target: LOAD_VUS },
@@ -37,9 +37,10 @@ export const options = {
       : {
           project_review_smoke: {
             executor: 'per-vu-iterations',
-            vus: 1,
+            vus: 100,
             iterations: 1,
-            maxDuration: '10m'
+            maxDuration: '2m',  // smoke only — review typically completes in ~3m
+            gracefulStop: '30s'
           }
         }
 };
