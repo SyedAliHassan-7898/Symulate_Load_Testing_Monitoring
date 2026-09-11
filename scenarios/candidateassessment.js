@@ -434,6 +434,12 @@ export function submitActivity(candidateToken, candidateId, activity, candidateN
         situationId = '4c1418d8-391e-4a3f-8cf9-1607c015629e';
       }
 
+      // Extra pause before opening the transcript socket for SITUATIONS.
+      // Anum needs a moment after session-start to register the room on
+      // its side; without this the first SITUATIONS activity closes with
+      // lines_acked=0 because the server isn't ready to ack yet.
+      sleep(2);
+
       const turn = buildSituationTurn(label, candidateName, seed);
       transcriptResult = runTranscriptConversation({
         candidateToken,
@@ -544,8 +550,19 @@ export function performAllActivities(email, password, candidateId, activities, o
 
   const results = [];
 
-  activities.forEach((activity) => {
+  activities.forEach((activity, activityIndex) => {
     log('Flow', `Starting activity: ${activity.title} (${activity.type})`);
+
+    // First activity gets an extra warm-up pause so Anum's WebSocket
+    // server has time to fully initialise the session before we open
+    // the transcript socket. Without this the socket closes with
+    // lines_acked=0 and the activity scores null.
+    // Subsequent activities don't need it — the server is already warm.
+    if (activityIndex === 0) {
+      log('Flow', 'First activity — waiting 3 s for Anum session warm-up');
+      sleep(3);
+    }
+
     const res = submitActivity(candidateToken, actualCandidateId, activity, candidateName, projectId);
     results.push({
       activity: activity.title || activity.type,

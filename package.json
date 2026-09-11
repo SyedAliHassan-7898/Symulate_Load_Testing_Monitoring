@@ -20,6 +20,8 @@
     "load:client-project:situation": "node scripts/run.js tests/load-client-project.js LOAD_MODE=load SCENARIO=situation-only",
     "load:candidate": "node scripts/run.js tests/load-candidate-assessment.js LOAD_MODE=load SCENARIO=full",
     "load:candidate:situation": "node scripts/run.js tests/load-candidate-assessment.js LOAD_MODE=load SCENARIO=situation-only",
+    "review": "node scripts/run.js tests/load-project-review.js SCENARIO=full",
+    "review:grafana": "node scripts/run.js tests/load-project-review.js SCENARIO=full K6_INFLUXDB_PUSH_INTERVAL=3s --out influxdb=http://localhost:8087/k6",
     "load:review": "node scripts/run.js tests/load-project-review.js LOAD_MODE=load SCENARIO=full",
     "report:csv": "node scripts/generate-csv-report.js",
     "monitoring:up": "docker compose -f monitoring/docker-compose.yml up -d",

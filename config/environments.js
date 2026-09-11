@@ -47,7 +47,7 @@ export const SCENARIO = __ENV.SCENARIO || 'full';
 export const LOAD_MODE = __ENV.LOAD_MODE || 'smoke';
 
 export const NUM_CANDIDATES = Number(__ENV.NUM_CANDIDATES || 1);
-export const SEND_PROJECT_INVITATIONS = String(__ENV.SEND_PROJECT_INVITATIONS || 'true').toLowerCase() !== 'true';
+export const SEND_PROJECT_INVITATIONS = String(__ENV.SEND_PROJECT_INVITATIONS || 'false').toLowerCase() !== 'true';
 export const SEND_CLIENT_EMAIL = String(__ENV.SEND_CLIENT_EMAIL || 'true').toLowerCase() !== 'false';
 
 // Hardcoded assessment access values used for the booked candidate flow.
