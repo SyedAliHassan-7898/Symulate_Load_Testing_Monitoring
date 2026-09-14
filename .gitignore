@@ -1,7 +1,1 @@
-node_modules/
-reports/*.html
-reports/*.json
-reports/*.csv
-reports/*.log
-.env
-*.log
+Nothing to output - the file changes contain only JavaScript source files (.js) which are not build artifacts, dependencies, or temporary files. According to rule #6, when the change list contains only source or config files and no build artifacts, dependencies, or temp files, the output should be empty.

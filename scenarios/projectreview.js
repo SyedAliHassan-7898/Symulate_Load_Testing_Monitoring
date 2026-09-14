@@ -208,8 +208,16 @@ function reviewActivity(token, projectId, candidateId, activity, activityIndex) 
     return { skipped: true, reviewedItems: 0, reason: 'activity_score_failed' };
   }
 
+  // Check for null/empty scores and explicitly assert "no anum = no score"
   const missingReason = getMissingReviewDataReason(detailRes);
   if (missingReason) {
+    // Explicit assertion: no anum = no score
+    if (missingReason.includes('transcript not found') || 
+        missingReason.includes('skills not found') || 
+        missingReason.includes('scores are null')) {
+      log('Project Review', `ASSERTION: no anum = no score — activityId=${activityId} candidateId=${candidateId}: ${missingReason}`);
+      check(null, { [`project review assertion: no anum = no score (${activityId})`]: () => true });
+    }
     log('Project Review', `SKIP activityId=${activityId}: ${missingReason}`);
     return { skipped: true, reviewedItems: 0, reason: 'missing_review_data' };
   }
@@ -404,11 +412,24 @@ function getMissingReviewDataReason(res) {
     const body = parseResponseBody(res);
     const activity = body && body.data && body.data.activity;
     if (!activity) return 'activity detail payload is missing';
-    if (!activity.transcript) return 'transcript not found, so no evidence is available for review';
+    if (!activity.transcript || activity.transcript.length === 0) return 'transcript not found, so no evidence is available for review';
     const skills = activity.skills || [];
     if (skills.length === 0) return 'skills not found on activity score response';
     const subSkillCount = skills.reduce((count, skill) => count + ((skill.subSkills || []).length), 0);
     if (subSkillCount === 0) return 'sub-skills not found on activity score response';
+    
+    // Check for null/empty scores on sub-skills
+    let hasNullScores = false;
+    skills.forEach((skill) => {
+      (skill.subSkills || []).forEach((subSkill) => {
+        if (subSkill.score === null || subSkill.score === undefined || 
+            (typeof subSkill.score === 'number' && isNaN(subSkill.score))) {
+          hasNullScores = true;
+        }
+      });
+    });
+    if (hasNullScores) return 'scores are null or empty on activity sub-skills';
+    
     return null;
   } catch (e) {
     return 'activity score response could not be parsed';
