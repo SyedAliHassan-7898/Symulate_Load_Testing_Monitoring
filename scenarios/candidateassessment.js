@@ -335,7 +335,7 @@ function clientSessionId() {
 export function submitActivity(candidateToken, candidateId, activity, candidateName = 'Candidate', projectId = HARDCODED_PROJECT_ID) {
   const activityId = activity.id;
   const label = activity.title || activity.type || 'Unknown';
-  const stepName = ANUM_API_ENABLED ? 'Submit Activity (Anum evaluation)' : 'Submit Activity (No Anum)';
+  const stepName = ANUM_API_ENABLED ? 'Submit Activity (Anum evaluation)' : 'Submit Activity';
   const activityClientSessionId = clientSessionId();
 
   // DEBUG: log values being sent to API
@@ -409,11 +409,7 @@ export function submitActivity(candidateToken, candidateId, activity, candidateN
   // WebRTC engine and is out of reach for a load-testing tool).
   // ------------------------------------------------------------------
   let transcriptResult = { transcriptConfirmed: false, linesAcked: 0 };
-  
-  // Skip transcript conversation if ANUM_API_ENABLED is false
-  if (!ANUM_API_ENABLED) {
-    log('Flow', `ANUM_API_ENABLED=false — skipping transcript conversation for ${label} (${activityId})`);
-  } else if (sessionId) {
+  if (sessionId) {
     const seed = (__VU || 0) + (__ITER || 0);
     if (activity.type === 'SITUATIONS') {
       let situationId = null;
