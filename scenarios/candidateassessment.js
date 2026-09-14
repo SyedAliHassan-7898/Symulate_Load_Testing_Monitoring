@@ -335,7 +335,7 @@ function clientSessionId() {
 export function submitActivity(candidateToken, candidateId, activity, candidateName = 'Candidate', projectId = HARDCODED_PROJECT_ID) {
   const activityId = activity.id;
   const label = activity.title || activity.type || 'Unknown';
-  const stepName = ANUM_API_ENABLED ? 'Submit Activity (Anum evaluation)' : 'Submit Activity';
+  const stepName = ANUM_API_ENABLED ? 'Submit Activity (Anum evaluation)' : 'Submit Activity (No Anum)';
   const activityClientSessionId = clientSessionId();
 
   // DEBUG: log values being sent to API
@@ -409,7 +409,11 @@ export function submitActivity(candidateToken, candidateId, activity, candidateN
   // WebRTC engine and is out of reach for a load-testing tool).
   // ------------------------------------------------------------------
   let transcriptResult = { transcriptConfirmed: false, linesAcked: 0 };
-  if (sessionId) {
+  
+  // Skip transcript conversation if ANUM_API_ENABLED is false
+  if (!ANUM_API_ENABLED) {
+    log('Flow', `ANUM_API_ENABLED=false — skipping transcript conversation for ${label} (${activityId})`);
+  } else if (sessionId) {
     const seed = (__VU || 0) + (__ITER || 0);
     if (activity.type === 'SITUATIONS') {
       let situationId = null;
@@ -548,9 +552,25 @@ export function performAllActivities(email, password, candidateId, activities, o
 
   log('Flow', `Processing all ${activities.length} activities`);
 
+  // When ANUM_API_ENABLED=false, only SITUATIONS activities should be performed
+  // Other activity types (ROLE_PLAY, INTERVIEW, CASE, BOARD_MEETING) require persona dialogue
+  // which depends on Anum API being enabled
+  const filteredActivities = !ANUM_API_ENABLED 
+    ? activities.filter(activity => activity.type === 'SITUATIONS')
+    : activities;
+  
+  if (!ANUM_API_ENABLED && filteredActivities.length === 0) {
+    log('Flow', 'ANUM_API_ENABLED=false and no SITUATIONS activities found — skipping all activities');
+    return [];
+  }
+  
+  if (!ANUM_API_ENABLED && filteredActivities.length < activities.length) {
+    log('Flow', `ANUM_API_ENABLED=false — filtered from ${activities.length} to ${filteredActivities.length} SITUATIONS activities only`);
+  }
+
   const results = [];
 
-  activities.forEach((activity, activityIndex) => {
+  filteredActivities.forEach((activity, activityIndex) => {
     log('Flow', `Starting activity: ${activity.title} (${activity.type})`);
 
     // First activity gets an extra warm-up pause so Anum's WebSocket
